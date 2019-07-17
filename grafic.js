@@ -1,31 +1,32 @@
 const canvas = document.getElementById('canvas');
-const height = window.innerHeight - 200;
-const width = window.innerWidth - 100;
+const height = window.innerHeight;
+const width = window.innerWidth;
 canvas.height = height;
 canvas.width = width;
 c = canvas.getContext('2d');
 
-console.log(height, width);
+// graph cuadricule variables
+const xAxis = height / 2;
+const yAxis = width / 2;
+const cero = {
+  x: xAxis,
+  y: yAxis,
+};
+const one = 40;
 
 function graphing() {
   // canvas
   c.fillRect(0, 0, width, height);
-  // graph cuadricule variables
-  const one = 40;
-  const xAxis = height / 2;
-  const yAxis = width / 2;
-  const cero = {
-    x: xAxis,
-    y: yAxis,
-  };
 
   let x = {
-    position: cero.y,
+    position: width / 2,
+    axis: height / 2,
     start: 0,
     end: width,
   };
   let y = {
-    position: cero.x,
+    position: height / 2,
+    axis: width / 2,
     start: 0,
     end: height,
   };
@@ -61,9 +62,34 @@ function graphing() {
     c.moveTo(cero.y, y.position);
     c.lineTo(cero.y + 5, y.position);
   }
-  console.log(y.position, y.end);
 
   c.stroke();
 }
 
+function funcGrapher(exp) {
+  c.beginPath();
+  // evaluate the expresion for all values of x
+  // map canvas width to domain
+  // map canvas height to codomain
+  for (let i = 0; i <= width; i++) {
+    let currentX = (i - cero.y) / one;
+    let currentY = math.evaluate(exp, { x: currentX });
+    let graphX = i;
+    let graphY = cero.x - currentY * one;
+    if (i === 0) {
+      c.moveTo(graphX, graphY);
+    }
+    c.lineTo(graphX, graphY);
+  }
+  c.stroke();
+}
+
 graphing();
+
+// take input from the user
+
+const input = document.getElementById('input');
+input.addEventListener('change', e => {
+  graphing();
+  funcGrapher(e.target.value);
+});
