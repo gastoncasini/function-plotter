@@ -12,7 +12,16 @@ const cero = {
   x: xAxis,
   y: yAxis,
 };
+// value of one
 const one = 40;
+
+// print a string in the canvas
+function print(text, y, x) {
+  console.log(arguments);
+  c.font = '20px serif';
+  c.fillStyle = 'white';
+  c.fillText(text, x, y);
+}
 
 function graphing() {
   // canvas
@@ -83,7 +92,9 @@ function funcGrapher(exp) {
     let graphX = i;
     let graphY = cero.x - currentY * one;
 
-    // coditional for points out of the domain
+    // coditional for discontinuous functions
+    // moves the last point to the current point
+    // without drawing
     if (i > 1) {
       if (values[i - 1].y === Infinity || values[i - 1].y === -Infinity) {
         console.log(currentX, currentY);
@@ -112,6 +123,7 @@ function funcGrapher(exp) {
 }
 
 graphing();
+print(0, cero.x + 20, cero.y - 20);
 
 // take input from the user
 
@@ -120,5 +132,5 @@ input.addEventListener('change', e => {
   // clear graph
   graphing();
   // graph function
-  console.log(funcGrapher(e.target.value));
+  funcGrapher(e.target.value);
 });
