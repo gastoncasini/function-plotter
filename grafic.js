@@ -17,14 +17,28 @@ const one = 40;
 
 // print a string in the canvas
 function print(text, y, x) {
-  console.log(arguments);
-  c.font = '20px serif';
+  c.font = '16px serif';
   c.fillStyle = 'white';
   c.fillText(text, x, y);
+  if (y === xAxis + 20) {
+    console.log(x / one, (x - 20) / one);
+  }
+}
+function drawLine(from, to, width, style = 'white') {
+  c.beginPath();
+  c.strokeStyle = style;
+  c.lineWidth = width;
+
+  c.moveTo(from.x, from.y);
+
+  c.lineTo(to.x, to.y);
+  c.stroke();
 }
 
 function graphing() {
   // canvas
+  c.beginPath();
+  c.fillStyle = 'black';
   c.fillRect(0, 0, width, height);
 
   let x = {
@@ -40,41 +54,48 @@ function graphing() {
     end: height,
   };
 
-  // draw Axis
-  c.beginPath();
-  c.strokeStyle = 'white';
-  c.lineWidth = 2;
-  c.moveTo(0, xAxis);
-  c.lineTo(width, xAxis);
-  c.moveTo(yAxis, 0);
-  c.lineTo(yAxis, height);
-  c.stroke();
-  // draw units
-  c.lineWidth = 0.25;
+  // start position of graph lines
+  // horizontal
+  let hLine = (x.axis % one) + 0.5;
+  // vertical
+  let vLine = (y.axis % one) + 0.5;
 
-  while (x.position < x.end) {
-    x.position = x.position + one;
-    c.moveTo(x.position + 0.5, 0);
-    c.lineTo(x.position + 0.5, height);
-  }
+  for (let i = 0; i < 100; i++) {
+    // inside the loop the line width changes when:
+    // 1- the line is one of the axis
+    // 2- the line is one of the indicated numbers
+    let lineWidthY = 0.25;
+    let lineWidthX = 0.25;
 
-  while (x.position > x.start) {
-    x.position = x.position - one;
-    c.moveTo(x.position + 0.5, 0);
-    c.lineTo(x.position + 0.5, height);
-  }
-  while (y.position < y.end) {
-    y.position = y.position + one;
-    c.moveTo(0, y.position);
-    c.lineTo(width, y.position);
-  }
-  while (y.position > y.start) {
-    y.position = y.position - one;
-    c.moveTo(0, y.position + 0.5);
-    c.lineTo(width, y.position + 0.5);
-  }
+    // values of x
+    let xValue = (vLine - 0.5 - y.axis) / one;
+    /* next step use a variable insted of 5,
+     to divide xValue to use it when resizing the graph */
+    if (xValue % 5 === 0 || xValue === 0) {
+      print(xValue, x.axis, vLine);
+      lineWidthY = 0.5;
+    }
 
-  c.stroke();
+    // values of y
+    let yValue = (hLine - 0.5 - x.axis) / one;
+    if (yValue % 5 === 0 && yValue !== 0) {
+      print(-yValue, hLine, y.axis);
+      lineWidthX = 0.5;
+    }
+
+    // bolder line to axis
+
+    if (hLine - 0.5 === x.axis) {
+      lineWidthX = 1;
+    } else if (vLine - 0.5 === y.axis) {
+      lineWidthY = 1;
+    }
+    drawLine({ x: 0, y: hLine }, { x: width, y: hLine }, lineWidthX);
+    drawLine({ x: vLine, y: 0 }, { x: vLine, y: height }, lineWidthY);
+
+    hLine = hLine + one;
+    vLine = vLine + one;
+  }
 }
 
 function funcGrapher(exp) {
@@ -97,7 +118,6 @@ function funcGrapher(exp) {
     // without drawing
     if (i > 1) {
       if (values[i - 1].y === Infinity || values[i - 1].y === -Infinity) {
-        console.log(currentX, currentY);
         c.moveTo(graphX, graphY);
       }
     }
@@ -119,11 +139,10 @@ function funcGrapher(exp) {
   }
 
   c.stroke();
+
   return values;
 }
-
 graphing();
-print(0, cero.x + 20, cero.y - 20);
 
 // take input from the user
 
