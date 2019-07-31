@@ -18,6 +18,7 @@ let y = {
   start: 0,
   end: height,
 };
+
 // value of one
 const one = 40;
 
@@ -26,9 +27,6 @@ function print(text, y, x) {
   c.font = '16px serif';
   c.fillStyle = 'white';
   c.fillText(text, x, y);
-  if (y === y.cero + 20) {
-    console.log(x / one, (x - 20) / one);
-  }
 }
 function drawLine(from, to, width, style = 'white') {
   c.beginPath();
@@ -53,7 +51,7 @@ function graphing() {
   // vertical
   let vLine = (x.cero % one) + 0.5;
 
-  for (let i = 0; i < 01000; i++) {
+  for (let i = 0; i <= width; i++) {
     // inside the loop the line width changes when:
     // 1- the line is one of the axis
     // 2- the line is one of the indicated numbers
@@ -131,21 +129,19 @@ function funcGrapher(exp) {
   }
 
   c.stroke();
-
-  return values;
 }
 graphing();
 
 // take input from the user
-let curve;
+
+let exp;
 const input = document.getElementById('input');
 input.addEventListener('change', e => {
   // clear graph
   graphing();
   // graph function
   exp = e.target.value;
-  curve = funcGrapher(exp);
-  console.log(curve);
+  funcGrapher(exp);
 });
 
 // on click moves the graph
@@ -179,5 +175,6 @@ canvas.addEventListener('mousemove', e => {
     y.cero = y.cero + (yPosition - yOldPosition);
 
     graphing();
+    funcGrapher(exp);
   }
 });
