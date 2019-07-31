@@ -6,11 +6,17 @@ canvas.width = width;
 c = canvas.getContext('2d');
 
 // graph cuadricule variables
-const xAxis = height / 2;
-const yAxis = width / 2;
-const cero = {
-  x: xAxis,
-  y: yAxis,
+let x = {
+  cero: width / 2,
+  axis: height / 2,
+  start: 0,
+  end: width,
+};
+let y = {
+  cero: height / 2,
+  axis: width / 2,
+  start: 0,
+  end: height,
 };
 // value of one
 const one = 40;
@@ -20,7 +26,7 @@ function print(text, y, x) {
   c.font = '16px serif';
   c.fillStyle = 'white';
   c.fillText(text, x, y);
-  if (y === xAxis + 20) {
+  if (y === y.cero + 20) {
     console.log(x / one, (x - 20) / one);
   }
 }
@@ -41,53 +47,39 @@ function graphing() {
   c.fillStyle = 'black';
   c.fillRect(0, 0, width, height);
 
-  let x = {
-    position: width / 2,
-    axis: height / 2,
-    start: 0,
-    end: width,
-  };
-  let y = {
-    position: height / 2,
-    axis: width / 2,
-    start: 0,
-    end: height,
-  };
-
   // start position of graph lines
   // horizontal
-  let hLine = (x.axis % one) + 0.5;
+  let hLine = (y.cero % one) + 0.5;
   // vertical
-  let vLine = (y.axis % one) + 0.5;
+  let vLine = (x.cero % one) + 0.5;
 
-  for (let i = 0; i < 100; i++) {
+  for (let i = 0; i < 01000; i++) {
     // inside the loop the line width changes when:
     // 1- the line is one of the axis
     // 2- the line is one of the indicated numbers
     let lineWidthY = 0.25;
     let lineWidthX = 0.25;
-
     // values of x
-    let xValue = (vLine - 0.5 - y.axis) / one;
+    let xValue = (vLine - 0.5 - x.cero) / one;
     /* next step use a variable insted of 5,
      to divide xValue to use it when resizing the graph */
     if (xValue % 5 === 0 || xValue === 0) {
-      print(xValue, x.axis, vLine);
+      print(xValue, y.cero, vLine);
       lineWidthY = 0.5;
     }
 
     // values of y
-    let yValue = (hLine - 0.5 - x.axis) / one;
+    let yValue = (hLine - 0.5 - y.cero) / one;
     if (yValue % 5 === 0 && yValue !== 0) {
-      print(-yValue, hLine, y.axis);
+      print(-yValue, hLine, x.cero);
       lineWidthX = 0.5;
     }
 
     // bolder line to axis
 
-    if (hLine - 0.5 === x.axis) {
+    if (hLine - 0.5 === y.cero) {
       lineWidthX = 1;
-    } else if (vLine - 0.5 === y.axis) {
+    } else if (vLine - 0.5 === x.cero) {
       lineWidthY = 1;
     }
     drawLine({ x: 0, y: hLine }, { x: width, y: hLine }, lineWidthX);
@@ -108,10 +100,10 @@ function funcGrapher(exp) {
   // map canvas width to domain
   // map canvas height to codomain
   for (let i = 0; i <= width; i++) {
-    let currentX = (i - cero.y) / one;
+    let currentX = (i - x.cero) / one;
     let currentY = math.evaluate(exp, { x: currentX });
     let graphX = i;
-    let graphY = cero.x - currentY * one;
+    let graphY = y.cero - currentY * one;
 
     // coditional for discontinuous functions
     // moves the last point to the current point
@@ -145,11 +137,47 @@ function funcGrapher(exp) {
 graphing();
 
 // take input from the user
-
+let curve;
 const input = document.getElementById('input');
 input.addEventListener('change', e => {
   // clear graph
   graphing();
   // graph function
-  funcGrapher(e.target.value);
+  exp = e.target.value;
+  curve = funcGrapher(exp);
+  console.log(curve);
+});
+
+// on click moves the graph
+let isMoving;
+let xPosition;
+let xOldPosition;
+
+let yPosition;
+let yOldPosition;
+
+canvas.addEventListener('mousedown', e => {
+  isMoving = true;
+  xPosition = e.clientX;
+  yPosition = e.clientY;
+});
+
+canvas.addEventListener('mouseup', e => {
+  isMoving = false;
+});
+
+canvas.addEventListener('mousemove', e => {
+  if (isMoving) {
+    // x graph move
+    xOldPosition = xPosition;
+    xPosition = e.clientX;
+    x.cero = x.cero + (xPosition - xOldPosition);
+    // y graph move
+
+    yOldPosition = yPosition;
+    yPosition = e.clientY;
+    y.cero = y.cero + (yPosition - yOldPosition);
+
+    graphing();
+  }
 });
